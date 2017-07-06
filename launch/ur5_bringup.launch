@@ -15,7 +15,7 @@
   <arg name="max_payload"  default="5.0"/>
   <arg name="prefix" default="" />
   <!-- robot model -->
-  <include file="$(find ur_description)/launch/ur5_upload.launch">
+  <include file="$(find dexf_ur5_package)/launch/ur5_upload_new.launch">
     <arg name="limited" value="$(arg limited)"/>
   </include>
   

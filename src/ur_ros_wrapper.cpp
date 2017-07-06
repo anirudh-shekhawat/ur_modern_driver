@@ -50,7 +50,7 @@
 #include "std_msgs/String.h"
 #include <controller_manager/controller_manager.h>
 #include <realtime_tools/realtime_publisher.h>
-
+#include "std_msgs/Int8MultiArray.h"
 #include <std_srvs/Empty.h>
 
 /// TF
@@ -737,8 +737,10 @@ private:
 
 	void publishMbMsg() {
 		bool warned = false;
+		std_msgs::Int8MultiArray protective_stop ;
 		ros::Publisher io_pub = nh_.advertise<ur_msgs::IOStates>(
 				"ur_driver/io_states", 1);
+		ros::Publisher arm_emergency_pub = nh_.advertise<std_msgs::Int8MultiArray>("/arm_emergency",1);
 
 		while (ros::ok()) {
 			ur_msgs::IOStates io_msg;
@@ -782,9 +784,19 @@ private:
 					or robot_.sec_interface_->robot_state_->isProtectiveStopped()) {
 				if (robot_.sec_interface_->robot_state_->isEmergencyStopped()
 						and !warned) {
+					protective_stop.data.push_back(100);
+				    protective_stop.data.push_back(1);
+                    protective_stop.data.push_back(102);
+                    arm_emergency_pub.publish(protective_stop);
+                    protective_stop.data.clear();
 					print_error("Emergency stop pressed!");
 				} else if (robot_.sec_interface_->robot_state_->isProtectiveStopped()
 						and !warned) {
+					protective_stop.data.push_back(100);
+                    protective_stop.data.push_back(1);
+                    protective_stop.data.push_back(101);
+                    arm_emergency_pub.publish(protective_stop);
+                    protective_stop.data.clear();
 					print_error("Robot is protective stopped!");
 				}
 				if (has_goal_) {
